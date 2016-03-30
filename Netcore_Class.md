@@ -80,6 +80,8 @@ Netcore(cntlr, ncInfo)
 <a name="Methods"></a>
 ## Methods  
 
+* ._getDriver(nspace, drvname)
+
 * .txBytes()
 * .rxBytes()
 * .getBlacklist()
