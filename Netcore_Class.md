@@ -10,30 +10,64 @@ Netcore class for freebird. This class is exported by **freebird-base** module.
 * [Constructor](#Constructor)  
 * [Properties](#Properties)  
 * [Methods](#Methods)  
+* [Arch](#Arch)  
 
 <br />
 
 <a name="Constructor"></a>
 ## Constructor  
 
-new Netcore(info)
+Netcore(cntlr, ncInfo)
 
 <br />
 
 <a name="Properties"></a>
 ## Properties  
 
-* drivers = {};
+**Examples:**  
+  
+```js
+{
+    // private
+    __blacklist: Array,
+
+    // protected
+    _enabled: Boolean,      // @start
+    _registered: Boolean,   // @registered to fb framework
+    _freebird: Object,      // @registered to fb framework
+
+    _startTime: Number,
+    _traffic: {
+        in: Number,
+        out: Number
+    },
+
+    _controller: Object,    // raw module
+    _drivers: {
+        net: {},
+        dev: {},
+        gad: {}
+    },
+
+    // Public
+    name: String,
+    protocol: Object,
+
+}
+```
 
 <a name="CbMethods"></a>
 ## Callbacks  
 
-* .cookDevice(raw)
-* .cookGadget(raw)
-* .drivers.permitJoin(raw)
-* .drivers.removeDevice(raw)
-* .drivers.identify(raw)
+* .cookRawDev(raw)
+* .cookRawGad(raw)
+
+<!-- * .drivers.permitJoin(raw)
+* .drivers.start(raw)
+* .drivers.stop(raw)
 * .drivers.reset(raw)
+* .drivers.removeDev(raw)
+* .drivers.identify(raw)
 * .drivers.maintain(raw)
 * .drivers.ping(raw)
 * .drivers.findParent(raw)
@@ -41,96 +75,92 @@ new Netcore(info)
 * .drivers.writeAttr(raw)
 * .drivers.execAttr(raw)
 * .drivers.setReportCfg(raw)
-* .drivers.getReportCfg(raw)
+* .drivers.getReportCfg(raw) -->
 
 <a name="Methods"></a>
 ## Methods  
 
-* .registerDriver('permitJoin', function (duration) { })
+* .txBytes()
+* .rxBytes()
+* .getBlacklist()
+* .dump()
+
+* .registerNetDrivers(drvs)
+* .registerDevDrivers(drvs)
+* .registerGadDrivers(drvs)
+
 * .registerDeivce(raw)
 * .registerGadget(dev, auxId)
+
 * .permitJoin(duration)
 * .maintain()
 * .reset()
 * .enable()
 * .disable()
+* .removeDev(permAddr)
+* .banDev(permAddr)
+* .unbanDev(permAddr) 
+* .start()
 
 
-fb.registerNetcore(nc);
+<a name="Arch"></a>
+## Arch  
 
-//----------------------------------
-nc.newDevice = function (raw) {
-    var dev = new Device(this, raw);
-    dev._netcore = this;
-    dev._raw = raw;
+**New Netcore:**  
 
-    dev = this.cookDevice(dev);
-    nc.registerDevice(dev);
+```js
+var fbbs = require('freebird-base'),
+    rawMod = require('some-controller');
+
+var netInfo = {
+    name: 'myNet',
+    protocol: {
+        // fill with what?
+    }
 };
 
-nc.newGadget = function (dev) {
-    
-    gad = this.cookGadget();
-    dev.registerGadget(gad);
+// create a new netcore
+// _controller, name, protocol
+var nc = fbbs.Netcore(rawMod, netInfo);
+
+// override
+nc.cookRawDev = function (raw, dev) {
+    // fill up dev
 };
 
-// developer tells nc how to transform a raw device into a ripe one
-nc.deviceRawToRipe = function (raw, ripe) {
-    // raw instance
-    // ripe is Device class
-    ripe._maySleep
-    ripe.role
-    ripe.parent             // permanent address
-    ripe.address = {
-        permanent: null,
-        dynamic: null
-    };
-    ripe.extra
+nc.cookRawGad = function (raw, gad) {
+    // fill up gad
 };
 
-nc.registerDevice = function (dev) {
-    // dev id
-};
+// register drivers
+nc.registerNetDrivers({
+    start: function () {},
+    stop: function () {},
+    reset: function () {},
+    permitJoin: function (duration) {},
+    maintain: function () {},
+    enable: function () {},
+    disable: function () {},
+    remove: function () {},
+    ban: function () {},
+    unban: function () {}
+});
 
+nc.registerDevDrivers({
+    read: function (dev) {},
+    write: function (dev) {},
+    identify: function (dev) {},
+    ping: function (dev) {}
+});
 
-// before cookDevice
-* _netcore      -> getNetcore()
-* _raw (X)
+nc.registerGadDrivers({
+    read: function (gad) {},
+    write: function (gad) {},
+    exec: function (gad) {},
+    setReportCfg: function (gad) {},
+    getReportCfg: function (gad) {}
+});
 
-// @ cookDevice
-* maySleep
-* role
-* parent
-* address
-    * address.permanent
-    * address.dynamic
-* extra (RW)
-* attributes
-    * name (RW)
-    * description (RW)
-    * location (RW)
-    * manufacturer (R)
-    * model (R)
-    * serial (R)
-    * version (R)
-        * version.hw
-        * version.sw
-        * version.fmw
-    * power (R)
-        * power.type
-        * power.voltage
-
-// after cookDevice
-//  registerDevice()
-* _id (R)       -> getId()
-* _enabled (R)  -> isEnabled()
-* _joinTime     -> getJoinTime()
-* _registered   -> isRegistered()
-* status
-
-//--------------------------------------
-// device.registerGadget()
-* _gads (R)     -> gadgetList()
-
-
-
+// if we are done, export the netcore
+module.exports = nc;
+```

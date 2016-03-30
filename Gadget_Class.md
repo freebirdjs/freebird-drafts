@@ -1,7 +1,7 @@
 Gadget Class
 ===============
 
-Gadget class for freebird. This class is exported by **freebird-base** module.  
+Gadget class for freebird. This class is exported by **freebird-base** module. Using netcore.registerGadget() creates a new gadget instance of this class.  
 
 <br />
 
@@ -16,26 +16,34 @@ Gadget class for freebird. This class is exported by **freebird-base** module.
 <a name="Constructor"></a>
 ## Constructor  
 
-new Gadget(device, auxId)
+Gadget(dev, auxId)
 
 <br />
 
 <a name="Properties"></a>
 ## Properties  
 
-* _id (R)
-* _owner
-* _enabled (R)
-* _registered
+  
+```js
+{
+    // protected
+    _id: Number,            // @start
+    _owner: Object,
+    _enable: Boolean,       // @registered to fb framework
+    _registered: Boolean,   // @registered to fb framework
+    _freebird: Object,      // @registered to fb framework
 
-* profile
-* class
-* auxId
-
-* attributes
-    * name
-    * description
-    * keys
+    // Public
+    profile: String,
+    class: String,
+    auxId: String | Number
+    attrs: {
+        name: String,
+        description: String,
+        // kvps...
+    }
+}
+```
 
 <br />
 
@@ -50,4 +58,6 @@ new Gadget(device, auxId)
 * exec(name[, params])
 * setReportCfg(name, rptCfg)
 * getReportCfg(name, rptCfg)
+* set() - local attr
+* get() - local attr
 
