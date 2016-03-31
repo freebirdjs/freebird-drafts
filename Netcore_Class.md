@@ -57,25 +57,129 @@ Netcore(cntlr, ncInfo)
 ```
 
 <a name="CbMethods"></a>
-## Callbacks  
+## Callbacks developers should implement 
 
-* .cookRawDev(raw)
-* .cookRawGad(raw)
+* .cookRawDev(dev, raw)
+    - `dev` is the instance of Device class
+    - `raw` is an object coming from the low-level controller. This object is passed by developer himself(herself).  
+    - Developer is responsible for filling up the fields of `dev`
 
-<!-- * .drivers.permitJoin(raw)
-* .drivers.start(raw)
-* .drivers.stop(raw)
-* .drivers.reset(raw)
-* .drivers.removeDev(raw)
-* .drivers.identify(raw)
-* .drivers.maintain(raw)
-* .drivers.ping(raw)
-* .drivers.findParent(raw)
-* .drivers.readAttr(raw)
-* .drivers.writeAttr(raw)
-* .drivers.execAttr(raw)
-* .drivers.setReportCfg(raw)
-* .drivers.getReportCfg(raw) -->
+```js
+    // fields of the dev object to be filled up
+    {
+        role: 'end-dev',                // optional, String
+        parent: '0x123456789',          // optional, String
+        maySleep: true,                 // optional, Boolean
+        address: {                      // required, Object
+            permanent: '0x9876543210',      // required, String
+            dynamic: '192.168.7.26'         // optional, String
+        },
+        extra: mySpecialData,           // optional, Any
+        attrs: {                        // optional, Object
+            name: 'unknown',                // String
+            description: 'hello world',     // String
+            location: 'unknown',            // String
+            manufacturer: 'freebird',       // String
+            model: 'dragon_ball_1',         // String
+            serial: 'mqtt-2016-03-31-01',   // String
+            version: {
+                hw: 'v0.0.1',               // String
+                sw: 'v0.2.0',               // String
+                fmw: 'v1.0.0'               // String
+            },
+            power: {
+                type: 'battery',            // String
+                voltage: '5V'               // String
+            }
+        }
+    }
+```
+
+```js
+    dev.attrs.manufacturer = raw.manuf;
+
+    dev.set('attrs.myAttr1', 'test');
+    // dev.attrs.myAttr1 = 'test';
+```
+
+* .cookRawGad(gad, meta)
+* .unifyRawDevAttrs(attrs)
+* .unifyRawGadAttrs(attrs)
+
+<a name="Drivers"></a>
+## Drivers developers should implement 
+
+* Network drivers
+
+
+
+* Device drivers
+
+| Driver Name | Mandatory | Driver Signature                         | Callback Signature    | Description                           |
+|-------------|-----------|------------------------------------------|-----------------------|---------------------------------------|
+| read        | required  | function(dev, attrName, callback)        | callback(err, result) | Read a device attribute               |
+| write       | required  | function(dev, attrName, value, callback) | callback(err, result) | Write a value to the device attribute |
+| identify    | optional  | function(dev, callback)                  | callback(err, result) | Identify a device                     |
+
+* Gadget drivers
+
+| Driver Name  | Mandatory | Driver Signature                         | Callback Signature    | Description                           |
+|--------------|-----------|------------------------------------------|-----------------------|---------------------------------------|
+| read         | required  | function(gad, attrName, callback)        | callback(err, result) | Read a gadget attribute               |
+| write        | required  | function(gad, attrName, value, callback) | callback(err, result) | Write a value to the gadget attribute |
+| exec         | optional  | function(gad, attrName, args, callback)  | callback(err, result) | Execute                               |
+| setReportCfg | optional  | function(gad, attrName, cfg, callback)   | callback(err, result) |                                       |
+| getReportCfg | optional  | function(gad, attrName, callback)        | callback(err, result) |                                       |
+
+
+## Device Drivers Example
+
+```js
+var controller = require('some-controller');
+
+var devDriverRead = function (dev, attrName, callback) {
+    var permAddr = dev.address.permanent,
+        qnode = controller.find(permAddr);
+
+    if (qnode)
+        qnode.read(attrName, function (err, rsp) {
+
+        });
+    else
+        callback(new Error('Machine not found'));
+};
+
+var devDriverWrite = function (dev, attrName, callback) {
+    var permAddr = dev.address.permanent,
+        qnode = controller.find(permAddr);
+
+    if (qnode)
+        qnode.read(attrName, function (err, rsp) {
+
+        });
+    else
+        callback(new Error('Machine not found'));
+};
+
+var devDriverIdentify = function (dev, attrName, callback) {
+    var permAddr = dev.address.permanent,
+        qnode = controller.find(permAddr);
+
+    if (qnode)
+        qnode.read(attrName, function (err, rsp) {
+
+        });
+    else
+        callback(new Error('Machine not found'));
+};
+
+nc.registerDevDrivers({
+    read: devDriverRead,
+    write: devDriverWrite,
+    identify: devDriverIdentify
+});
+
+```
 
 <a name="Methods"></a>
 ## Methods  
@@ -166,3 +270,38 @@ nc.registerGadDrivers({
 // if we are done, export the netcore
 module.exports = nc;
 ```
+
+
+
+/***********************************************************************/
+/*** Events emit up                                                  ***/
+/***   1. devIncoming + device                                       ***/
+/***   2. devLeaving + device                                        ***/
+/***   3. gadIncoming + gadget                                       ***/
+/***   4. permitJoin + timeLeft                                      ***/
+/***   5. devAttrsChanged + device, attrsObj                         ***/
+/***   6. gadAttrsChanged + gadget, attrsObj                         ***/
+/***   7. attrReport + gadget, attrsObj                              ***/
+/***   8. netChanged + device, netInfoObj                            ***/
+/***   9. statusChanged + device, status                             ***/
+/***********************************************************************/
+/***********************************************************************/
+/*** Developer should call                                           ***/
+/***   1. nc.devIncoming(raw)                                        ***/
+/***   2. nc.devLeaving(permAddr)                                    ***/
+/***   3. nc.gadIncoming(permAddr, auxId, meta)                      ***/
+/***   4. >> permitJoin + timeLeft                                   ***/
+/***   5. nc.reportDevAttrs(permAddr, attrs)                         ***/
+/***   6. nc.reportGadAttr(permAddr, auxId, attrs)                   ***/
+/***********************************************************************/
+/***********************************************************************/
+/*** Developer Implements                                            ***/
+/***   1. nc.cookRawDev()                                            ***/
+/***   2. nc.cookRawGad()                                            ***/
+/***   3. nc.cookRawDevAttrsReport()                                 ***/
+/***   4. nc.cookRawGadAttrsReport()                                 ***/
+/***   5. nc.drivers = { net, dev, gad }                             ***/
+/***          nc.registerNetDrivers({})                              ***/
+/***          nc.registerDevDrivers({})                              ***/
+/***          nc.registerGadDrivers({})                              ***/
+/***********************************************************************/
