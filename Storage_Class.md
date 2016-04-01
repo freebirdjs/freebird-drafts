@@ -48,6 +48,8 @@ Storage(file, maxNum)
 }
 ```
 
+**Notice**: id start from 1
+
 <br />
 
 <a name="Methods"></a>
