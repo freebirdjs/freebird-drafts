@@ -305,3 +305,47 @@ module.exports = nc;
 /***          nc.registerDevDrivers({})                              ***/
 /***          nc.registerGadDrivers({})                              ***/
 /***********************************************************************/
+
+APIs
+devIncoming
+devLeaving
+gadIncoming
+reportDevAttrs
+reportGadAttrs
+dump
+txBytesUp
+rxBytesUp
+
+registerNetDrivers
+registerDevDrivers
+registerGadDrivers
+
+this._drivers = {
+    net: {
+        start: null,        // function(callback) {}
+        stop: null,         // function(callback) {}
+        reset: null,        // function(callback) {}
+        permitJoin: null,   // function(duration, callback) {}
+        maintain: null,     // function([permAddr][, callback]) {}
+        // enable: null,
+        // disable: null,
+        remove: null,       // function(permAddr, callback) {}
+        ban: null,          // function(permAddr, callback) {}
+        unban: null,        // function(permAddr, callback) {}
+        ping: null          // function(permAddr, callback) {}
+    },
+    dev: {
+        read: null,         // function(permAddr, attr, callback) {}
+        write: null,        // function(permAddr, attr, val, callback) {}
+        identify: null,     // function(permAddr, callback) {}
+    },
+    gad: {
+        read: null,         // function(permAddr, auxId, attr, callback) {}
+        write: null,        // function(permAddr, auxId, attr, val, callback) {}
+        exec: null,         // function(permAddr, auxId, attr, args, callback) {}
+        setReportCfg: null, // function(permAddr, auxId, cfg, callback) {}
+        getReportCfg: null  // function(permAddr, auxId, callback) {}
+    }
+};
+
+
