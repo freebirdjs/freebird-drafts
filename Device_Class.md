@@ -42,7 +42,7 @@ Device(nc, raw)
     _id: Number,            // get from fb storage
     _enabled: Boolean,      // @registered
     _joinTime: Number,      // @registered
-    _lastTime: Number,
+    _timestamp: Number,     // @activity
     _gads: Object[],        // { gadId, auxId } assigned when adding a gadget to a device
     _traffic: {              // netcore should tackle this at TRX
         in: Number,
@@ -53,6 +53,8 @@ Device(nc, raw)
     role: String,           // developer gives
     parent: String,         // permanent address
     maySleep: Boolean,      // developer decides
+    sleepPeriod: Number,    // seconds
+    status: String,         // 'online', 'offline', 'sleep'
     address: {              // developer gives
         permanent: String,
         dynamic: String
@@ -94,9 +96,14 @@ Device(nc, raw)
     - num: Number. bytes
     - return Number, accumulated bytes
 
-* _isWorking()
+* _isWorking() - ok
     - is this device working? check if netcore, id, enabled are all ok
     - return Boolean
+
+* _markActivity() - ok
+    - timestamp to mark activity of this device, turn status to online
+    - return this
+
 
 * linkGad(gadId, auxId)
     - link a record of gadget to device
