@@ -28,10 +28,9 @@ Gadget(dev, auxId)
 {
     // protected
     _id: Number,            // @start
-    _owner: Object,
+    _dev: Object,
     _enable: Boolean,       // @registered to fb framework
-    _registered: Boolean,   // @registered to fb framework
-    _freebird: Object,      // @registered to fb framework
+    _fb: Object,            // @registered to fb framework
 
     // Public
     profile: String,
@@ -50,14 +49,18 @@ Gadget(dev, auxId)
 <a name="Methods"></a>
 ## Methods  
 
-* location()
+* isRegistered() - ok
+* isEnabled() - ok
+* enable() - ok
+* disable() - ok
+* getLocation() - ok
+* dump() - ok
 
-* dump()
-* read(name)
-* write(name, value)
-* exec(name[, params])
-* setReportCfg(name, rptCfg)
-* getReportCfg(name, rptCfg)
+* read(name) - ok
+* write(name, value) - ok
+* exec(name[, params]) - ok
+* setReportCfg(name, rptCfg) - ok
+* getReportCfg(name, rptCfg) - ok
 * set() - local attr
 * get() - local attr
 
