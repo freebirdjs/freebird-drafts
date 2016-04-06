@@ -1,7 +1,7 @@
 Gadget Class
 ===============
 
-Gadget class for freebird. This class is exported by **freebird-base** module. Using netcore.registerGadget() creates a new gadget instance of this class.  
+Gadget class for freebird. This class is exported by **freebird-base** module.  
 
 <br />
 
@@ -29,8 +29,8 @@ Gadget(dev, auxId)
     // protected
     _id: Number,            // @start
     _dev: Object,
+    _netcore: Object,
     _enable: Boolean,       // @registered to fb framework
-    _fb: Object,            // @registered to fb framework
 
     // Public
     profile: String,
@@ -40,7 +40,8 @@ Gadget(dev, auxId)
         name: String,
         description: String,
         // kvps...
-    }
+    },
+    extra: Object
 }
 ```
 
