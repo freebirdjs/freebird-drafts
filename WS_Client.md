@@ -59,4 +59,3 @@ WebSocket client library for webApp client developer
     * wsApis.gad.exec(id, attrName[, params])
     * wsApis.gad.setReportCfg(id, attrName, rptCfg)
     * wsApis.gad.getReportCfg(id, attrName)
-

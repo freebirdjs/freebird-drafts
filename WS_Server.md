@@ -7,9 +7,23 @@ WebSocket server library
 
 ## Table of Contents  
 
+* [Constructor](#Constructor)  
 * [Properties](#Properties)  
 * [Methods](#Methods) 
 * [Event](#Event)
+
+<a name="Constructor"></a>
+## Constructor  
+
+WsServer(fb)
+
+**Arguments:**  
+
+1. `fb` (_Object_): The freebird  
+
+**Returns:**  
+
+* (_Object_) wsServer (instance of WsServer class)
 
 <a name="Properties"></a>
 ## Properties  
@@ -19,8 +33,8 @@ WebSocket server library
 ```js
 {
     // private
-    _freebird: Object
-    _wsServer: Object       // an instance of WebSocketServerclass
+    _fb: Object
+    _wsServer: Object       // an instance of ws.Server
     _wsClients: Array
 }
 
@@ -29,10 +43,41 @@ WebSocket server library
 <a name="Methods"></a>
 ## Methods  
 
-* initialize(server)
-* getClients()
-* sendRsp(socket, data)
-	- encrypt
+* start(server)
+    - start running websocket server and listening connection event
+    - server: Object, http server
+    - return this
+
+* stop()
+    - stop running websocket server and terminate all clients
+    - return this
+
+* isRunning() 
+    - check server is running or not
+    - return Boolean
+
+* _initClient(wsClient) 
+    - process client 'messege', 'close', 'error' events and check authenticate
+
+* _reqHdlr(wsClient, reqMsg)
+    - check authorize and generate response data
+
+* _sendRsp(wsClient, reqMsg, rspCode, rspData)
+    - send response to websocket client
+
+* _sendInd(subsys, type, data, id)
+    - send indication to authorized client
+
+* onPermitJoin
+* onNetChanged
+* onStatusChanged
+* onDevIncoming
+* onDevLeaving
+* onGadIncoming
+* onGadLeaving
+* onAttrReport
+* onDevAttrsChanged
+* onGadAttrsChanged
 
 <br />
 
@@ -41,14 +86,14 @@ WebSocket server library
 
 //server
 * .on('connection')
-	- authenticate
+    - _initClient()
 * .on('error')
 
 //client
 * .on('message')
-	- decrypt
-	- authorize
-	- callApi
+    - decrypt
+    - authorize
+    - callApi
 * .on('close')
-	- remove socket from _wsClients
+    - remove all clients
 * .on('error')
