@@ -17,8 +17,23 @@ Netcore class for freebird. This class is exported by **freebird-base** module.
 <a name="Constructor"></a>
 ## Constructor  
 
-Netcore(cntlr, ncInfo)
+Netcore(name, cfg)
 
+```js
+{   // cfg
+    controller: Object, // required
+    protocol: {         // required
+        phy: String,    // required, physical layer
+        dll: String,    // optional, data link layer
+        nwk: String,    // required, network layer
+        tl: String,     // optional, transportation layer
+        sl: String,     // optional, session layer
+        pl: String,     // optional, presentation layer
+        apl: String,    // optional, application layer
+    },
+    xxx: ,              // other settings
+}
+```
 <br />
 
 <a name="Properties"></a>
@@ -184,12 +199,33 @@ nc.registerDevDrivers({
 <a name="Methods"></a>
 ## Methods  
 
-* ._getDriver(nspace, drvname)
+* getBlacklist - ok
+* clearBlacklist - ok
+* _block - ok
+* _unblock - ok
+* isBlacklisted -ok
+* _fbEmit - ok
+------------------------------------------
 
-* .txBytes()
-* .rxBytes()
-* .getBlacklist()
-* .dump()
+* isRegistered() - ok
+* isJoinable() - ok
+* isEnabled() - ok
+* enable() - ok
+* disable() - ok
+* dump() - ok
+
+* commitDevIncoming() - ok
+* commitDevLeaving() - ok
+* commitGadIncoming() - ok
+* commitDevReporting() - ok
+* commitGadReporting() - ok
+
+* incTxBytes() - ok
+* incRxBytes() - ok
+* resetTxTraffic() - ok
+* resetRxTraffic() - ok
+
+* ._getDriver(nspace, drvname)
 
 * .registerNetDrivers(drvs)
 * .registerDevDrivers(drvs)
@@ -201,12 +237,30 @@ nc.registerDevDrivers({
 * .permitJoin(duration)
 * .maintain()
 * .reset()
-* .enable()
-* .disable()
 * .removeDev(permAddr)
 * .banDev(permAddr)
 * .unbanDev(permAddr) 
 * .start()
+
+<a name="Events"></a>
+## Events  
+
+* _nc:enabled, { netcore: nc }
+* _nc:disabled, { netcore: nc }
+* _nc:error, { netcore: nc, error: err }
+* _nc:devIncoming, { netcore: nc, permAddr: addr, data: rawDev }
+* _nc:bannedDevIncoming, { netcore: nc, permAddr: addr, data: rawDev }
+* _nc:devLeaving, { netcore: nc, permAddr: addr }
+* _nc:gadIncoming, { netcore: nc, permAddr: addr, auxId: auxId, data: rawGad }
+* _nc:bannedGadIncoming, { netcore: nc, permAddr: addr, auxId: auxId, data: rawGad }
+* _nc:devReporting, { netcore: nc, permAddr: addr, data: attrs }
+* _nc:bannedDevReporting, { netcore: nc, permAddr: addr, data: attrs }
+* _nc:gadReporting, { netcore: nc, permAddr: addr, auxId: auxId, data: attrs }
+* _nc:bannedGadReporting, { netcore: nc, permAddr: addr, auxId: auxId, data: attrs }
+
+* _dev:netChanged, { netcore: nc, id: id, permAddr: addr, data: info }
+* _dev:propsChanged, { netcore: nc, id: id, permAddr: addr, data: info }
+* _dev:attrsChanged, { netcore: nc, id: id, permAddr: addr, data: info }
 
 
 <a name="Arch"></a>

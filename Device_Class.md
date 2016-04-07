@@ -36,41 +36,37 @@ Device(netcore, rawDev)
   
 ```js
 {
-    // protected
     _netcore: Object,
-    _raw: Object,           // raw device object from low-level module
-    _id: Number,            // @fb device registered
-    _enabled: Boolean,      // @fb device registered
-    _joinTime: Number,      // @fb device registered
-    _timestamp: Number,     // @activity
-    _gads: Object[],        // @fb gadget registered { gadId, auxId } assigned when adding a gadget to a device
-    _traffic: {             // netcore should tackle this at TRX
-        in: {
-            hits: 0,        // how many messages received
-            bytes: 0        // how many bytes received in
+    _raw: Object,               // raw device object from low-level module
+    _id: Number,                // @fb device registered
+    _gads: Object[],            // @fb gadget registered { gadId, auxId } assigned when adding a gadget to a device
+
+    _net: {
+        enabled: Boolean,       // @fb device registered
+        joinTime: Number,       // @fb device registered
+        timestamp: Number,      // @activity
+        traffic: {              // netcore should tackle this at TRX
+            in: { hits: 0, bytes: 0 },  // how many messages received, how many bytes received in
+            out: { hits: 0, bytes: 0 }, // how many messages transmitted, how many bytes transmitted out
         },
-        out: {
-            hits: 0,        // how many messages transmitted
-            bytes: 0        // how many bytes transmitted out
-        }
+        role: String,           // [opt] developer gives
+        parent: String,         // [opt] developer gives, permanent address, '0' for netcore
+        maySleep: Boolean,      // [opt] developer gives
+        sleepPeriod: Number,    // [opt] seconds
+        status: String,         // [fb] 'online', 'offline', 'sleep'
+        address: {              // developer gives
+            permanent: String,
+            dynamic: String
+        },
     },
 
-    // public
-    role: String,           // [opt] developer gives
-    parent: String,         // [opt] developer gives, permanent address, '0' for netcore
-    maySleep: Boolean,      // [opt] developer gives
-    sleepPeriod: Number,    // [opt] seconds
-    status: String,         // [fb] 'online', 'offline', 'sleep'
-    address: {              // developer gives
-        permanent: String,
-        dynamic: String
-    },
-    extra: Any,             // developer gives, free to use
-
-    attrs: {
+    _props: {
         name: String,           // allow user to set
         description: String,    // allow user to set
         location: String,       // allow user to set
+    },
+
+    _attrs: {
         manufacturer: String,   // client-node gives
         model: String,          // client-node gives
         serial: String,         // client-node gives
@@ -83,7 +79,9 @@ Device(netcore, rawDev)
             type: Number,       // client-node gives
             voltage: Number     // client-node gives
         }
-    }
+    },
+
+    extra: Any,                 // developer gives, free to use
 }
 ```
 
@@ -108,10 +106,7 @@ Device(netcore, rawDev)
     - disable this device to avoid it from sending/receiving messages
     - return this
 
-* disable() - ok
-    - disable this device to avoid it from sending/receiving messages
-    - return this
-
+* refresh()
 
 * resetTxTraffic() - ok
     - rest tx traffice
