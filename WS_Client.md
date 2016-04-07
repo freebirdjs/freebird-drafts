@@ -7,9 +7,17 @@ WebSocket client library for webApp client developer
 
 ## Table of Contents  
 
+* [Constructor](#Constructor)  
 * [Properties](#Properties)  
 * [Methods](#Methods) 
-* [Event](@Event)
+* [Event](#Event)
+
+<a name="Constructor"></a>
+## Constructor  
+
+WsClient()
+
+<br />
 
 <a name="Properties"></a>
 ## Properties  
@@ -19,12 +27,10 @@ WebSocket client library for webApp client developer
 ```js
 {
     // private
-    _wsClient: Object       // an instance of WebSocketClient class
-    _wsApis: {
-        net: {},
-        dev: {},
-        gad: {}
-    }
+    _wsClient: Object,       // an instance of WebSocketClient class
+    _auth: Boolean,
+    _connected: Boolean,
+    _nextTransId: Function
 }
 
 <br />
@@ -32,30 +38,38 @@ WebSocket client library for webApp client developer
 <a name="Methods"></a>
 ## Methods  
 
-* encrypt(msg)
-* decrypt(msgBuf)
-* regClientInfo(userName, password)
-* sendReq(subSys, cmd, args)
-    * wsApis.net.getAllDevIds([ncName])
-    * wsApis.net.getAllGadIds([ncName])
-    * wsApis.net.getDevs(ids)
-    * wsApis.net.getGads(ids)
-    * wsApis.net.getNetcores(ncNames)
-    * wsApis.net.getBlacklist(ncName)
-    * wsApis.net.permitJoin(ncName, duration)
-    * wsApis.net.maintain(ncName)
-    * wsApis.net.reset(ncName)
-    * wsApis.net.enable(ncName)
-    * wsApis.net.disable(ncName)
-    * wsApis.net.ban(ncName, permAddr)
-    * wsApis.net.unban(ncName, permAddr)
-    * wsApis.net.remove(devId)
-    * wsApis.net.ping(devId)
-    * wsApis.dev.read(id, attrName)
-    * wsApis.dev.write(id, attrName, value)
-    * wsApis.dev.identify(id)
-    * wsApis.gad.read(id, attrName)
-    * wsApis.gad.write(id, attrName, value)
-    * wsApis.gad.exec(id, attrName[, params])
-    * wsApis.gad.setReportCfg(id, attrName, rptCfg)
-    * wsApis.gad.getReportCfg(id, attrName)
+* start(addr, option, authData)
+    - start running websocket client, and sent authentication data to server to do authenticate
+    - addr: String, host address
+    - option: Object, same as ws.WebSocket
+    - authData: Object
+
+* stop()
+    - stop running websocket client
+
+* sendReq(subSys, cmd, args, callback)
+    - send request to websocket server
+    - subSys: String, 'net', 'dev', and 'gad'
+    - cmd: String, command identifier corresponding to the API name
+    - args: Object, a value-object that contains command arguments
+    - callback: Function, get called when server respond to client with the results
+
+<br />
+
+<a name="Event"></a>
+## Event
+
+* open
+* close
+* error
+
+// {subsys, id, data}
+* permitJoining
+* netChanged
+* statusChanged
+* devIncoming
+* devLeaving
+* gadIncoming
+* gadLeaving
+* attrReport
+* attrsChanged
