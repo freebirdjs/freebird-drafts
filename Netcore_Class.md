@@ -243,29 +243,34 @@ nc.registerDevDrivers({
 * .start()
 
 <a name="Events"></a>
-## Events  
+## Events to Freebird (fb.emit) 
+
+* _nc:started, { netcore: nc }
+* _nc:stopped, { netcore: nc }
+* _nc:resetting, { netcore: nc }
+* _nc:permitJoin, { netcore: nc }
 
 * _nc:enabled, { netcore: nc }
 * _nc:disabled, { netcore: nc }
 * _nc:error, { netcore: nc, error: err }
-* _nc:devIncoming, { netcore: nc, permAddr: addr, data: rawDev }
-* _nc:bannedDevIncoming, { netcore: nc, permAddr: addr, data: rawDev }
-* _nc:devLeaving, { netcore: nc, permAddr: addr }
-* _nc:gadIncoming, { netcore: nc, permAddr: addr, auxId: auxId, data: rawGad }
-* _nc:bannedGadIncoming, { netcore: nc, permAddr: addr, auxId: auxId, data: rawGad }
-* _nc:devReporting, { netcore: nc, permAddr: addr, data: attrs }
-* _nc:bannedDevReporting, { netcore: nc, permAddr: addr, data: attrs }
-* _nc:gadReporting, { netcore: nc, permAddr: addr, auxId: auxId, data: attrs }
-* _nc:bannedGadReporting, { netcore: nc, permAddr: addr, auxId: auxId, data: attrs }
 
-* _dev:netChanged, { netcore: nc, id: id, permAddr: addr, data: info }
-* _dev:propsChanged, { netcore: nc, id: id, permAddr: addr, data: info }
-* _dev:attrsChanged, { netcore: nc, id: id, permAddr: addr, data: info }
+* _nc:devIncoming, { netcore: nc, permAddr: addr, data: rawDev }                        - find diff     -> _dev:netChanged, _dev:attrsChanged
+* _nc:bannedDevIncoming, { netcore: nc, permAddr: addr, data: rawDev }                  - find existence
+* _nc:devLeaving, { netcore: nc, permAddr: addr }                                       - find existence
+* _nc:gadIncoming, { netcore: nc, permAddr: addr, auxId: auxId, data: rawGad }          - find diff     -> _gad:panelChanged, _gad:attrsChanged
+* _nc:bannedGadIncoming, { netcore: nc, permAddr: addr, auxId: auxId, data: rawGad }    - find existence
+* _nc:devReporting, { netcore: nc, permAddr: addr, data: attrs }                        - find diff     -> _dev:attrsChanged
+* _nc:bannedDevReporting, { netcore: nc, permAddr: addr, data: attrs }                  - find existence
+* _nc:gadReporting, { netcore: nc, permAddr: addr, auxId: auxId, data: attrs }          - find diff     -> _dev:attrsChanged
+* _nc:bannedGadReporting, { netcore: nc, permAddr: addr, auxId: auxId, data: attrs }    - find existence
 
-* _gad:panelChanged, { netcore: nc, permAddr: addr, id: id, auxId: auxId, data: info }
-* _gad:propsChanged, { netcore: nc, permAddr: addr, id: id, auxId: auxId, data: info }
-* _gad:attrsChanged, { netcore: nc, permAddr: addr, id: id, auxId: auxId, data: info }
+* _dev:netChanged, { netcore: nc, id: id, permAddr: addr, data: info }                  - changed
+* _dev:propsChanged, { netcore: nc, id: id, permAddr: addr, data: info }                - changed
+* _dev:attrsChanged, { netcore: nc, id: id, permAddr: addr, data: info }                - changed
 
+* _gad:panelChanged, { netcore: nc, permAddr: addr, id: id, auxId: auxId, data: info }  - changed
+* _gad:propsChanged, { netcore: nc, permAddr: addr, id: id, auxId: auxId, data: info }  - changed
+* _gad:attrsChanged, { netcore: nc, permAddr: addr, id: id, auxId: auxId, data: info }  - changed
 
 <a name="Arch"></a>
 ## Arch  
