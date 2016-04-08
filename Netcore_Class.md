@@ -262,6 +262,10 @@ nc.registerDevDrivers({
 * _dev:propsChanged, { netcore: nc, id: id, permAddr: addr, data: info }
 * _dev:attrsChanged, { netcore: nc, id: id, permAddr: addr, data: info }
 
+* _gad:panelChanged, { netcore: nc, permAddr: addr, id: id, auxId: auxId, data: info }
+* _gad:propsChanged, { netcore: nc, permAddr: addr, id: id, auxId: auxId, data: info }
+* _gad:attrsChanged, { netcore: nc, permAddr: addr, id: id, auxId: auxId, data: info }
+
 
 <a name="Arch"></a>
 ## Arch  

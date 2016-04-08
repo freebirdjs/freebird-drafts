@@ -21,7 +21,7 @@ Device(netcore, rawDev)
 **Arguments:**  
 
 1. `nc` (_Object_): The netcore  
-2. `rawDev` (_Object_): Raw device data(object) from low-level controller..
+2. `rawDev` (_Object_, optional): Raw device data(object) from low-level controller..
 
 **Returns:**  
 
@@ -90,14 +90,6 @@ Device(netcore, rawDev)
 <a name="Methods"></a>
 ## Methods  
 
-* isRegistered() - ok
-    - check if this device is registered to freebird
-    - return Boolean
-
-* isEnabled() - ok
-    - check if this device is enabled
-    - return Boolean
-
 * enable() - ok
     - enable this device to let it send/receive messages
     - return this
@@ -106,11 +98,77 @@ Device(netcore, rawDev)
     - disable this device to avoid it from sending/receiving messages
     - return this
 
-* refresh()
+* getNetcore() - ok
+    - get netcore of this device
+    - return Object, netcore instance
+
+* getRawDev() - ok
+    - get raw of this device
+    - return Object, raw device
+
+* getId() - ok
+    - device id
+    - return Number
+
+<!-- * getJoinTime() - ok
+    - join time
+    - return Number, POSIX secs
+ -->
+* getGadTable() - ok
+    - a list of gadget records
+    - return Array. This is a cloned list
+
+* isRegistered() - ok
+    - check if this device is registered to freebird
+    - return Boolean
+
+* isEnabled() - ok
+    - check if this device is enabled
+    - return Boolean
+
+* getAddress() - ok
+    - get device address
+    - return Object, { permanent, dynamic }
+
+* getPermAddr() - ok
+    - get device permanent address
+    - return String
+
+* getStatus() - ok
+    - get device status
+    - return String, 'online', 'offline', 'sleep', 'unknown'
+
+* getTraffic() - ok
+    - get device traffice
+    - return Object, { in: { hits, bytes }, out: { hits, bytes } }
+
+* getNetInfo() - ok
+    - get device network information
+    - return Object
+
+* getProps() - ok
+    - get device properties
+    - return Object
+
+* getAttrs() - ok
+    - get device remote attributes
+    - return Object
+
+* setNetInfo() - ok
+    - set device network information
+    - return this
+
+* setProps() - ok
+    - set device properties
+    - return this
+
+* setAttrs() - ok
+    - set remote attributes
+    - return this
 
 * resetTxTraffic() - ok
     - rest tx traffice
-    - return Object { hits, bytes }
+    - return Object { in, out }
 
 * resetRxTraffic() - ok
     - rest rx traffice
@@ -119,6 +177,12 @@ Device(netcore, rawDev)
 * dump() - ok
     - dump device data. Entries in dumped data are all cloned.
     - return Object
+
+* refresh() - ok
+    - refresh device remote attrs
+    - return this
+
+### Protected Method
 
 * _incTxBytes(num) - ok
     - accumeulate receiving data bytes
@@ -137,25 +201,6 @@ Device(netcore, rawDev)
     - generic setter, only public properties can be set. But not attrs. If path does not start with attrs, it will be set to attrs? WTF?!
     - return value. Value is a cloned one if it is an object
 
-* getNetcore() - ok
-    - get netcore of this device
-    - return Object, netcore instance
-
-* getRaw() - ok
-    - get raw of this device
-    - return Object, raw device
-
-* getId() - ok
-    - device id
-    - return Number
-
-* getJoinTime() - ok
-    - join time
-    - return Number, POSIX secs
-
-* getGadTable() - ok
-    - a list of gadget records
-    - return Array. This is a cloned list
 
 ### Drivers
 
