@@ -126,7 +126,7 @@ Device(netcore, rawDev)
     - check if this device is enabled
     - return Boolean
 
-* getAddress() - ok
+* getAddr() - ok
     - get device address
     - return Object, { permanent, dynamic }
 
@@ -142,27 +142,27 @@ Device(netcore, rawDev)
     - get device traffice
     - return Object, { in: { hits, bytes }, out: { hits, bytes } }
 
-* getNetInfo() - ok
+* getNetInfo(paths) - ok
     - get device network information
     - return Object
 
-* getProps() - ok
+* getProps(paths) - ok
     - get device properties
     - return Object
 
-* getAttrs() - ok
+* getAttrs(paths) - ok
     - get device remote attributes
     - return Object
 
-* setNetInfo() - ok
+* setNetInfo(info) - ok
     - set device network information
     - return this
 
-* setProps() - ok
+* setProps(props) - ok
     - set device properties
     - return this
 
-* setAttrs() - ok
+* setAttrs(attrs) - ok
     - set remote attributes
     - return this
 
@@ -178,13 +178,21 @@ Device(netcore, rawDev)
     - dump device data. Entries in dumped data are all cloned.
     - return Object
 
-* refresh() - ok
+* refresh(callback) - ok
     - refresh device remote attrs
     - return this
 
 ### Protected Method
 
+* _get(type, paths) - ok
+* _fbEmit(evt, data) - ok
+
 * _incTxBytes(num) - ok
+    - accumeulate transmitting data bytes
+    - num: Number. bytes
+    - return Number, accumulated bytes
+
+* _incRxBytes(num) - ok
     - accumeulate receiving data bytes
     - num: Number. bytes
     - return Number, accumulated bytes
@@ -193,14 +201,8 @@ Device(netcore, rawDev)
     - timestamp to mark activity of this device
     - return this
 
-* getAttr(path) - ok
-    - generic getter, only public properties can be exported
-    - return value. Value is a cloned one if it is an object
-
-* setAttr(path) - ok
-    - generic setter, only public properties can be set. But not attrs. If path does not start with attrs, it will be set to attrs? WTF?!
-    - return value. Value is a cloned one if it is an object
-
+* _linkGadWithAuxId(auxId) - ok
+* _findGadRecordByAuxId(auxId) - ok
 
 ### Drivers
 
@@ -219,11 +221,6 @@ Device(netcore, rawDev)
 * ping(callback)
     - Ping a device in the network  
     - callback(err, result)
-
-* ping(callback)
-    - Ping a device in the network  
-    - callback(err, result)
-
 
 
 
