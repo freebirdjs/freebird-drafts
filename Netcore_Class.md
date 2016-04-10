@@ -47,34 +47,57 @@ Netcore(name, cfg)
     __blacklist: Array,
 
     // protected
-    _enabled: Boolean,      // @start
-    _registered: Boolean,   // @registered to fb framework
-    _freebird: Object,      // @registered to fb framework
+    _joinTimer: Object,
+    _joinTicks: Number,
+    _controller: Object,        // raw module
+    _ticks: Number,
+    _defaultJoinTime: Number,
+    _fb: Object,                // @registered to fb framework
 
-    _startTime: Number,
-    _traffic: {
-        in: Number,
-        out: Number
+    _net: {
+        name: String,
+        enabled: Boolean,       // @start
+        protocol: Object,
+        startTime: Number,
+        traffic: {
+            in: { hits, bytes },
+            out: { hits, bytes }
+        },
     },
 
-    _controller: Object,    // raw module
     _drivers: {
-        net: {},
-        dev: {},
-        gad: {}
+        net: {  // functions
+            start, stop, reset, permitJoin, remove, ban, unban, ping
+        },
+        dev: {  // functions
+            read, write, identify
+        },
+        gad: {  // functions
+            read, write, exec, setReportCfg, getReportCfg, report
+        }
     },
+
+    // User Override
+    cookRawDev: Function,
+    cookRawGad: Function,
+    unifyRawDevAttrs: Function,
+    unifyRawGadAttrs: Function,
 
     // Public
-    name: String,
-    protocol: Object,
+    extra: Any,
 
+    getBlacklist: Function,
+    clearBlacklist: Function,
+    isBlacklisted: Function,
+    _block: Function,
+    _unblock: Function
 }
 ```
 
 <a name="CbMethods"></a>
 ## Callbacks developers should implement 
 
-* .cookRawDev(dev, raw)
+* cookRawDev(dev, rawDev, callback)
     - `dev` is the instance of Device class
     - `raw` is an object coming from the low-level controller. This object is passed by developer himself(herself).  
     - Developer is responsible for filling up the fields of `dev`
@@ -117,9 +140,9 @@ Netcore(name, cfg)
     // dev.attrs.myAttr1 = 'test';
 ```
 
-* .cookRawGad(gad, meta)
-* .unifyRawDevAttrs(attrs)
-* .unifyRawGadAttrs(attrs)
+* cookRawGad(gad, rawGad, callback)
+* unifyRawDevAttrs(attrs) [TODO]
+* unifyRawGadAttrs(attrs) [TODO]
 
 <a name="Drivers"></a>
 ## Drivers developers should implement 
@@ -199,40 +222,110 @@ nc.registerDevDrivers({
 <a name="Methods"></a>
 ## Methods  
 
-* getBlacklist - ok
-* clearBlacklist - ok
-* _block - ok
-* _unblock - ok
-* isBlacklisted -ok
-* _fbEmit - ok
+* getBlacklist()
+    - get blacklist
+    - return a cloned Array of permanent addresses
+
+* clearBlacklist()
+    - clear blacklist
+    - return this
+
+* isBlacklisted(permAddr)
+    - check if device is blocked
+    - return Boolean
+
+* _block(permAddr)
+    - block a device
+    - return this
+
+* _unblock(permAddr)
+    - unblock a device
+    - return this
+
+* _fbEmit
+    - emit message by freebird. No emission if not registered
+    - retrun Boolean, emitted or not
 ------------------------------------------
-* getName - ok
-* isRegistered() - ok
-* isJoinable() - ok
-* isEnabled() - ok
-* enable() - ok
-* disable() - ok
-* dump() - ok
+* getName()
+    - get netcore name
+    - return String
 
-* commitDevIncoming() - ok
-* commitDevLeaving() - ok
-* commitGadIncoming() - ok
-* commitDevReporting() - ok
-* commitGadReporting() - ok
+* isRegistered()
+    - check if registered to freebird
+    - return Boolean
 
-* incTxBytes() - ok
-* incRxBytes() - ok
-* resetTxTraffic() - ok
-* resetRxTraffic() - ok
+* isJoinable()
+    - check if netcore is now joinable
+    - return Boolean
 
-* ._getDriver(nspace, drvname)
+* isEnabled()
+    - check if netcore is enabled
+    - return Boolean
 
-* .registerNetDrivers(drvs)
-* .registerDevDrivers(drvs)
-* .registerGadDrivers(drvs)
+* enable()
+    - enable netcore, emit '_nc:enabled', { netcore }
+    - return this;
 
-* .registerDeivce(raw)
-* .registerGadget(dev, auxId)
+* disable()
+    - disable netcore, emit '_nc:disabled', { netcore }
+    - return this;
+
+* dump()
+    - dump data for db store
+    - return Object, { name, enabled, protocol, startTime, traffic }
+
+<a name="UserCalledMethods"></a>
+## User Called Methods  
+
+* commitDevIncoming(permAddr, rawDev)
+    - commit the raw device object of an incoming device
+    - return Boolean, commit successfully 
+
+* commitDevLeaving(permAddr)
+    - commit a device leaving
+    - return Boolean, commit successfully
+
+* commitGadIncoming(permAddr, auxId, rawGad)
+    - commit the raw gadget object of an incoming gadget
+    - return Boolean, commit successfully 
+
+* commitDevReporting(permAddr, attrs)
+    - commit the attributes reporting from a device
+    - return Boolean, commit successfully 
+
+* commitGadReporting()
+    - commit the attributes reporting from a gadget
+    - return Boolean, commit successfully 
+
+* incTxBytes(num)
+    - accumeulate transmitting data bytes
+    - num: Number. bytes
+    - return Number, accumulated bytes
+
+* incRxBytes(num)
+    - accumeulate received data bytes
+    - num: Number. bytes
+    - return Number, accumulated bytes
+
+* resetTxTraffic()
+    - rest tx traffic
+    - return this
+
+* resetRxTraffic()
+    - rest rx traffic
+    - return this
+
+* registerNetDrivers(drvs)
+    - register network drivers
+    - return this | throw error if mandatory driver not given
+
+* registerDevDrivers(drvs)
+    - register device drivers
+    - return this | throw error if mandatory driver not given
+
+* registerGadDrivers(drvs)
+    - register gadget drivers
+    - return this | throw error if mandatory driver not given
 
 * .permitJoin(duration)
 * .maintain()

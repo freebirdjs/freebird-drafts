@@ -165,12 +165,12 @@ Device(netcore, rawDev)
     - return this, emit '_dev:attrsChanged', { data }
 
 * resetTxTraffic() - ok2
-    - rest tx traffice
+    - rest tx traffic
     - emit '_dev:netChanged', { data }, do include traffic
     - return this
 
 * resetRxTraffic() - ok2
-    - rest rx traffice
+    - rest rx traffic
     - emit '_dev:netChanged', { data }, do include traffic
     - return this
 
