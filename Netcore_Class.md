@@ -206,7 +206,7 @@ nc.registerDevDrivers({
 * isBlacklisted -ok
 * _fbEmit - ok
 ------------------------------------------
-
+* getName - ok
 * isRegistered() - ok
 * isJoinable() - ok
 * isEnabled() - ok
@@ -264,6 +264,8 @@ nc.registerDevDrivers({
 * _nc:gadReporting, { netcore: nc, permAddr: addr, auxId: auxId, data: attrs }          - find diff     -> _dev:attrsChanged
 * _nc:bannedGadReporting, { netcore: nc, permAddr: addr, auxId: auxId, data: attrs }    - find existence
 
+
+// dev and gad, emit { dev, data } and  { gad, data }
 * _dev:netChanged, { netcore: nc, id: id, permAddr: addr, data: info }                  - changed
 * _dev:propsChanged, { netcore: nc, id: id, permAddr: addr, data: info }                - changed
 * _dev:attrsChanged, { netcore: nc, id: id, permAddr: addr, data: info }                - changed

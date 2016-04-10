@@ -73,7 +73,7 @@ Device(netcore, rawDev)
         version: {
             hw: String,         // client-node gives
             sw: String,         // client-node gives
-            fmw: String         // client-node gives
+            fw: String         // client-node gives
         },
         power: {
             type: Number,       // client-node gives
@@ -90,135 +90,151 @@ Device(netcore, rawDev)
 <a name="Methods"></a>
 ## Methods  
 
-* enable() - ok
+* enable() - ok2
     - enable this device to let it send/receive messages
-    - return this
+    - return this, emit '_dev:netChanged', { enabled: true }
 
-* disable() - ok
+* disable() - ok2
     - disable this device to avoid it from sending/receiving messages
-    - return this
+    - return this, emit '_dev:netChanged', { enabled: false }
 
-* getNetcore() - ok
+* getNetcore() - ok2
     - get netcore of this device
     - return Object, netcore instance
 
-* getRawDev() - ok
+* getRawDev() - ok2
     - get raw of this device
     - return Object, raw device
 
-* getId() - ok
+* getId() - ok2
     - device id
     - return Number
 
-<!-- * getJoinTime() - ok
-    - join time
-    - return Number, POSIX secs
- -->
-* getGadTable() - ok
+* getGadTable() - ok2
     - a list of gadget records
     - return Array. This is a cloned list
 
-* isRegistered() - ok
+* isRegistered() - ok2
     - check if this device is registered to freebird
     - return Boolean
 
-* isEnabled() - ok
+* isEnabled() - ok2
     - check if this device is enabled
     - return Boolean
 
-* getAddr() - ok
+* getAddr() - ok2
     - get device address
     - return Object, { permanent, dynamic }
 
-* getPermAddr() - ok
+* getPermAddr() - ok2
     - get device permanent address
     - return String
 
-* getStatus() - ok
+* getStatus() - ok2
     - get device status
     - return String, 'online', 'offline', 'sleep', 'unknown'
 
-* getTraffic() - ok
+* getTraffic() - ok2
     - get device traffice
     - return Object, { in: { hits, bytes }, out: { hits, bytes } }
 
-* getNetInfo(paths) - ok
+* getNetInfo(keys) - ok2
     - get device network information
     - return Object
+    - if keys = [ 'x', 'y', 'z' ], returns { x: xx, y: yy, z: zz }
 
-* getProps(paths) - ok
+* getProps(keys) - ok2
     - get device properties
     - return Object
 
-* getAttrs(paths) - ok
+* getAttrs(keys) - ok2
     - get device remote attributes
     - return Object
 
-* setNetInfo(info) - ok
+* setNetInfo(info) - ok2
     - set device network information
-    - return this
+    - info is an object
+    - return this, emit '_dev:netChanged', { data }, ignore traffic and timestamp
 
-* setProps(props) - ok
+* setProps(props) - ok2
     - set device properties
-    - return this
+    - return this, emit '_dev:propsChanged', { data }
 
-* setAttrs(attrs) - ok
+* setAttrs(attrs) - ok2
     - set remote attributes
+    - return this, emit '_dev:attrsChanged', { data }
+
+* resetTxTraffic() - ok2
+    - rest tx traffice
+    - emit '_dev:netChanged', { data }, do include traffic
     - return this
 
-* resetTxTraffic() - ok
-    - rest tx traffice
-    - return Object { in, out }
-
-* resetRxTraffic() - ok
+* resetRxTraffic() - ok2
     - rest rx traffice
-    - return Object { hits, bytes }
+    - emit '_dev:netChanged', { data }, do include traffic
+    - return this
 
-* dump() - ok
+* dump() - ok2
     - dump device data. Entries in dumped data are all cloned.
-    - return Object
+    - return Object { netcore, id, gads, net, props, attrs }
 
-* refresh(callback) - ok
+* refresh(callback) - ok2
     - refresh device remote attrs
     - return this
 
 ### Protected Method
 
-* _get(type, paths) - ok
-* _fbEmit(evt, data) - ok
+* _get(type, keys) - ok2
+    - get _net, _props, or _attrs
+    - return cloned object | {}
 
-* _incTxBytes(num) - ok
+* _fbEmit(evt, data) - ok2
+    - emit freebird event
+    - return Boolean, emitted or not
+
+* _poke() - ok2
+    - timestamp to mark activity of this device
+    - return this
+
+* _incTxBytes(num) - ok2
     - accumeulate transmitting data bytes
     - num: Number. bytes
     - return Number, accumulated bytes
 
-* _incRxBytes(num) - ok
+* _incRxBytes(num) - ok2
     - accumeulate receiving data bytes
     - num: Number. bytes
     - return Number, accumulated bytes
 
-* _poke() - ok
-    - timestamp to mark activity of this device
-    - return this
+* _findGadRecordByAuxId(auxId) - ok2
+    - find the gadget record from gad table by auxId
+    - return Object | undefined, record { gadId, auxId }
 
-* _linkGadWithAuxId(auxId) - ok
-* _findGadRecordByAuxId(auxId) - ok
+* _linkGadWithAuxId(auxId) - ok2
+    - push gadget recored to gad table with auxId
+    - return Object | undefined, record { gadId, auxId }
+
+* _callDriver(drvName, args) - ok2
+    - call driver to do remote operation upon the device
+    - drvName (String): driver name
+    - args (Array-like arguments): arguments
+    - return (Inoked Driver)
 
 ### Drivers
 
-* read(attrName, callback)
-    - read an attribute  
+* read(attrName, callback) - ok2
+    - read an attribute from remote device  
     - callback(err, result)
 
-* write(attrName, val, callback)
+* write(attrName, val, callback) - ok2
     - write a value to an attribute  
     - callback(err, result)
 
-* identify(callback)
+* identify(callback) - ok2
     - Identify a device in the network  
     - callback(err, result)
 
-* ping(callback)
+* ping(callback) - ok2
     - Ping a device in the network  
     - callback(err, result)
 
