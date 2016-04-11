@@ -118,11 +118,19 @@ Storage(fileName, maxNum)
     - id (_Number_): device id
     - path (_String_): path to the value which you want to replace
     - value (_Depends_): the value of the object refer by path will be replaced to this value
-    - callback (_Function): get called when replace property to database is completed
+    - callback (_Function_): get called when replace property to database is completed
 
 * reload(callback)
     - load each object from database to box
     - callback (_Function_): get called when reload from database is completed
+
+* isFulfilled(callback)
+    - check whether the need to reload the box in each instance
+    - callback (_Function_): get called when the check is complete
+
+* mailtain(callback)
+    - Synchronize data between database and storage box, and update each data object to database.
+    - callback (_Function_): get called when maintain storage box is complete
 
 <br />
 
