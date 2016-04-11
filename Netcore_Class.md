@@ -17,21 +17,17 @@ Netcore class for freebird. This class is exported by **freebird-base** module.
 <a name="Constructor"></a>
 ## Constructor  
 
-Netcore(name, cfg)
+Netcore(name, controller, protocol[, opt])
 
 ```js
-{   // cfg
-    controller: Object, // required
-    protocol: {         // required
-        phy: String,    // required, physical layer
-        dll: String,    // optional, data link layer
-        nwk: String,    // required, network layer
-        tl: String,     // optional, transportation layer
-        sl: String,     // optional, session layer
-        pl: String,     // optional, presentation layer
-        apl: String,    // optional, application layer
-    },
-    xxx: ,              // other settings
+protocol: {         // required
+    phy: String,    // required, physical layer
+    dll: String,    // optional, data link layer
+    nwk: String,    // required, network layer
+    tl: String,     // optional, transportation layer
+    sl: String,     // optional, session layer
+    pl: String,     // optional, presentation layer
+    apl: String,    // optional, application layer
 }
 ```
 <br />
@@ -47,18 +43,17 @@ Netcore(name, cfg)
     __blacklist: Array,
 
     // protected
+    _fb: Object,                // @registered to fb framework
     _joinTimer: Object,
     _joinTicks: Number,
-    _controller: Object,        // raw module
-    _ticks: Number,
-    _defaultJoinTime: Number,
-    _fb: Object,                // @registered to fb framework
 
+    _controller: Object,        // raw module
     _net: {
         name: String,
         enabled: Boolean,       // @start
         protocol: Object,
         startTime: Number,
+        defaultJoinTime: 180,
         traffic: {
             in: { hits, bytes },
             out: { hits, bytes }
@@ -77,15 +72,14 @@ Netcore(name, cfg)
         }
     },
 
-    // User Override
-    cookRawDev: Function,
-    cookRawGad: Function,
-    unifyRawDevAttrs: Function,
-    unifyRawGadAttrs: Function,
-
     // Public
     extra: Any,
 
+    // Methods User Override
+    cookRawDev: Function,
+    cookRawGad: Function,
+
+    // Privileged Methods
     getBlacklist: Function,
     clearBlacklist: Function,
     isBlacklisted: Function,
@@ -95,145 +89,75 @@ Netcore(name, cfg)
 ```
 
 <a name="CbMethods"></a>
-## Callbacks developers should implement 
+## Methods developers should implement 
 
 * cookRawDev(dev, rawDev, callback)
-    - `dev` is the instance of Device class
-    - `raw` is an object coming from the low-level controller. This object is passed by developer himself(herself).  
-    - Developer is responsible for filling up the fields of `dev`
+    - `dev` is the instance of Device class  
+    - `rawDev` is an object coming from the low-level controller. This object is passed by developer himself(herself).  
+    - Developer is responsible for filling up the fields of `dev` instance  
+    - Use dev.setNetInfo() and dev.setAttrs() to accomplish the cooking job.  
 
-```js
-    // fields of the dev object to be filled up
-    {
-        role: 'end-dev',                // optional, String
-        parent: '0x123456789',          // optional, String
-        maySleep: true,                 // optional, Boolean
-        address: {                      // required, Object
-            permanent: '0x9876543210',      // required, String
-            dynamic: '192.168.7.26'         // optional, String
-        },
-        extra: mySpecialData,           // optional, Any
-        attrs: {                        // optional, Object
-            name: 'unknown',                // String
-            description: 'hello world',     // String
-            location: 'unknown',            // String
-            manufacturer: 'freebird',       // String
-            model: 'dragon_ball_1',         // String
-            serial: 'mqtt-2016-03-31-01',   // String
+    - Step1: setNetInfo(info)
+
+    ```js
+        dev.setNetInfo({
+            role: 'router',
+            parent: '02:1e:39:ff:ea:7c',
+            maySleep: true,
+            sleepPeriod: 30,
+            address: {
+                permanent: '72:ae:8f:e1:d0:32', // required
+                dynamic: '192.168.1.164'
+            }
+        });
+    ```
+
+
+    - Step2: setAttrs(attrs)
+
+    ```js
+        dev.setAttrs({
+            manufacturer: 'xxx',
+            model: 'xxx',
+            serial: 'xxx',
             version: {
-                hw: 'v0.0.1',               // String
-                sw: 'v0.2.0',               // String
-                fmw: 'v1.0.0'               // String
+                hw: 'xxx',
+                sw: 'xxx',
+                fw: 'xxx',
             },
             power: {
-                type: 'battery',            // String
-                voltage: '5V'               // String
+                type: 'xxx',
+                voltage: 'xxx'
             }
-        }
-    }
-```
-
-```js
-    dev.attrs.manufacturer = raw.manuf;
-
-    dev.set('attrs.myAttr1', 'test');
-    // dev.attrs.myAttr1 = 'test';
-```
+        });
+    ```
 
 * cookRawGad(gad, rawGad, callback)
-* unifyRawDevAttrs(attrs) [TODO]
-* unifyRawGadAttrs(attrs) [TODO]
+    - `gad` is the instance of Gadget class  
+    - `rawGad` is an object coming from the low-level controller. This object is passed by developer himself(herself).  
+    - Developer is responsible for filling up the fields of `gad` instance  
+    - Use gad.setPanelInfo() and gad.setAttrs() to accomplish the cooking job.  
 
-<a name="Drivers"></a>
-## Drivers developers should implement 
+    - Step1: setPanelInfo(info)
 
-* Network drivers
-
-
-
-* Device drivers
-
-| Driver Name | Mandatory | Driver Signature                         | Callback Signature    | Description                           |
-|-------------|-----------|------------------------------------------|-----------------------|---------------------------------------|
-| read        | required  | function(dev, attrName, callback)        | callback(err, result) | Read a device attribute               |
-| write       | required  | function(dev, attrName, value, callback) | callback(err, result) | Write a value to the device attribute |
-| identify    | optional  | function(dev, callback)                  | callback(err, result) | Identify a device                     |
-
-* Gadget drivers
-
-| Driver Name  | Mandatory | Driver Signature                         | Callback Signature    | Description                           |
-|--------------|-----------|------------------------------------------|-----------------------|---------------------------------------|
-| read         | required  | function(gad, attrName, callback)        | callback(err, result) | Read a gadget attribute               |
-| write        | required  | function(gad, attrName, value, callback) | callback(err, result) | Write a value to the gadget attribute |
-| exec         | optional  | function(gad, attrName, args, callback)  | callback(err, result) | Execute                               |
-| setReportCfg | optional  | function(gad, attrName, cfg, callback)   | callback(err, result) |                                       |
-| getReportCfg | optional  | function(gad, attrName, callback)        | callback(err, result) |                                       |
-
-
-## Device Drivers Example
-
-```js
-var controller = require('some-controller');
-
-var devDriverRead = function (dev, attrName, callback) {
-    var permAddr = dev.address.permanent,
-        qnode = controller.find(permAddr);
-
-    if (qnode)
-        qnode.read(attrName, function (err, rsp) {
-
+    ```js
+        gad.setPanelInfo({
+            profile: 'xxx',
+            class: 'xxx'    // required
         });
-    else
-        callback(new Error('Machine not found'));
-};
+    ```
 
-var devDriverWrite = function (dev, attrName, callback) {
-    var permAddr = dev.address.permanent,
-        qnode = controller.find(permAddr);
 
-    if (qnode)
-        qnode.read(attrName, function (err, rsp) {
+    - Step2: setAttrs(attrs)
 
+    ```js
+        gad.setAttrs({
+            // kvps
         });
-    else
-        callback(new Error('Machine not found'));
-};
+    ```
 
-var devDriverIdentify = function (dev, attrName, callback) {
-    var permAddr = dev.address.permanent,
-        qnode = controller.find(permAddr);
-
-    if (qnode)
-        qnode.read(attrName, function (err, rsp) {
-
-        });
-    else
-        callback(new Error('Machine not found'));
-};
-
-nc.registerDevDrivers({
-    read: devDriverRead,
-    write: devDriverWrite,
-    identify: devDriverIdentify
-});
-
-```
-
-<a name="Methods"></a>
-## Methods  
-
-* getBlacklist()
-    - get blacklist
-    - return a cloned Array of permanent addresses
-
-* clearBlacklist()
-    - clear blacklist
-    - return this
-
-* isBlacklisted(permAddr)
-    - check if device is blocked
-    - return Boolean
-
+<a name="ProtectedMethods"></a>
+## Protected Methods  
 * _block(permAddr)
     - block a device
     - return this
@@ -242,37 +166,100 @@ nc.registerDevDrivers({
     - unblock a device
     - return this
 
-* _fbEmit
+* _fbEmit(evt, data)
     - emit message by freebird. No emission if not registered
     - retrun Boolean, emitted or not
-------------------------------------------
-* getName()
-    - get netcore name
-    - return String
 
-* isRegistered()
+* _findDriver(type, name)
+    - find driver according to type (net, dev, gad) and driver name
+    - retrun Function | undefined  
+
+* _incTxBytes(num) - ok
+    - Accumulate transmitted bytes
+    - return Number, accumulated bytes
+
+* _incRxBytes(num) - ok
+    - Accumulate received bytes
+    - return Number, accumulated bytes
+
+* _startJoinTimer(duration) - ok
+    - start permit join timer
+    - return none, emit '_nc:permitJoin', { timeLeft: self._joinTicks } every second
+
+* _clearJoinTimer() - ok
+    - clear permit join timer
+    - return none
+
+* _findDriver(type, name) - ok
+    - find driver by type (net, dev, gad) and driver name
+    - return Function | undefined, driver
+
+* _checkBadDrivers() - ok
+    - check if all mandatory drivers of (net, dev, gad) are ready
+    - return Array of driver names that are not implemented
+
+<a name="Methods"></a>
+## Methods  
+
+* getBlacklist() - ok
+    - get blacklist
+    - return a cloned Array of permanent addresses
+
+* clearBlacklist() - ok
+    - clear blacklist
+    - return this
+
+* isBlacklisted(permAddr) - ok
+    - check if a device is blocked
+    - return Boolean
+
+* isRegistered() - ok
     - check if registered to freebird
     - return Boolean
 
-* isJoinable()
+* isJoinable() - ok
     - check if netcore is now joinable
     - return Boolean
 
-* isEnabled()
+* isEnabled() - ok
     - check if netcore is enabled
     - return Boolean
 
-* enable()
+* enable() - ok
     - enable netcore, emit '_nc:enabled', { netcore }
     - return this;
 
-* disable()
+* disable() - ok
     - disable netcore, emit '_nc:disabled', { netcore }
     - return this;
 
-* dump()
+* dump() - ok
     - dump data for db store
-    - return Object, { name, enabled, protocol, startTime, traffic }
+    - return Object, { name, enabled, protocol, startTime, defaultJoinTime, traffic }
+
+* getName() - ok
+    - get netcore name
+    - return String
+
+* getTraffic() - ok
+    - get netcore traffic record
+    - return Object, { in: { hits, bytes }, out: { hits, bytes } }
+
+* resetTxTraffic() - ok
+    - Reset accumulated tx hits and bytes
+    - return this
+
+* registerNetDrivers(drvs)
+    - register network drivers
+    - return this
+
+* registerDevDrivers(drvs)
+    - register device drivers
+    - return this
+
+* registerGadDrivers(drvs)
+    - register gadget drivers
+    - return this
 
 <a name="UserCalledMethods"></a>
 ## User Called Methods  
@@ -297,43 +284,103 @@ nc.registerDevDrivers({
     - commit the attributes reporting from a gadget
     - return Boolean, commit successfully 
 
-* incTxBytes(num)
-    - accumeulate transmitting data bytes
-    - num: Number. bytes
-    - return Number, accumulated bytes
+<a name="Drivers"></a>
+## Network, Device, and Gadget Drivers
 
-* incRxBytes(num)
-    - accumeulate received data bytes
-    - num: Number. bytes
-    - return Number, accumulated bytes
+* start(callback)
+    - start netcore and its controller, emit '_nc:started', { netcore } is started
+    - callback(err, result)
+    - return none 
 
-* resetTxTraffic()
-    - rest tx traffic
-    - return this
+* stop(callback)
+    - stop netcore and its controller, emit '_nc:stopped', { netcore } is stopped
+    - callback(err, result)
+    - return none 
 
-* resetRxTraffic()
-    - rest rx traffic
-    - return this
+* reset(mode, callback)
+    - reset netcore and controller, if mode === 1, blacklist will be cleared.
+    - emit '_nc:disabled', '_nc:enabled', and '_nc:started'
+    - callback(err, result)
+    - return none 
 
-* registerNetDrivers(drvs)
-    - register network drivers
-    - return this | throw error if mandatory driver not given
+* .permitJoin(duration, callback)
+    - allow devices to join the network
+    - emit '_nc:permitJoin', { netcore, timeLeft } every second
+    - callback(err, result) get called after set
+    - return none 
 
-* registerDevDrivers(drvs)
-    - register device drivers
-    - return this | throw error if mandatory driver not given
+* remove(permAddr, callback)
+    - remove a device from network
+    - emit '_nc:devLeaving', { netcore, permAddr }
+    - callback(err, result) get called after removed
+    - return none 
 
-* registerGadDrivers(drvs)
-    - register gadget drivers
-    - return this | throw error if mandatory driver not given
+* ban(permAddr, callback)
+    - ban a device from network
+    - emit '_nc:netBan', { netcore, permAddr }
+    - callback(err, result) get called after banned
+    - return none 
 
-* .permitJoin(duration)
-* .maintain()
-* .reset()
-* .removeDev(permAddr)
-* .banDev(permAddr)
-* .unbanDev(permAddr) 
-* .start()
+* unban(permAddr, callback) 
+    - unban a device from network
+    - emit '_nc:netUnban', { netcore, permAddr }
+    - callback(err, result) get called after unbanned
+    - return none 
+
+* ping(permAddr, callback)
+    - ping a device in network
+    - emit '_nc:netPing', { netcore, permAddr, data }
+    - callback(err, result) get called after ping
+    - return none 
+
+* devRead(permAddr, attrName, callback)
+    - read attribute from a device
+    - emit '_nc:devRead', { netcore, permAddr, data }
+    - callback(err, result) get called after read
+    - return none 
+
+* devWrite(permAddr, attrName, val, callback)
+    - write attribute of a device
+    - emit '_nc:devWrite', { netcore, permAddr, data }
+    - callback(err, result) get called after written
+    - return none 
+
+* identify(permAddr, callback)
+    - identify a device in the network
+    - emit '_nc:devIdentify', { netcore, permAddr }
+    - callback(err, result) get called after identified
+    - return none 
+
+* gadRead(permAddr, auxId, attrName, callback)
+    - read attribute from a gadget
+    - emit '_nc:gadRead', { netcore, permAddr, auxId, data }
+    - callback(err, result) get called after read
+    - return none 
+
+* gadWrite(permAddr, auxId, attrName, val, callback)
+    - write attribute of a gadget
+    - emit '_nc:gadWrite', { netcore, permAddr, auxId, data }
+    - callback(err, result) get called after written
+    - return none 
+
+* gadExec(permAddr, auxId, attrName, args, callback)
+    - execuate a procedure on a gadget
+    - emit '_nc:gadExec', { netcore, permAddr, auxId, data }
+    - callback(err, result) get called after executed
+    - return none 
+
+* setReportCfg(permAddr, auxId, attrName, cfg, callback)
+    - set the report settings of an attribute on a gadget
+    - emit '_nc:gadSetReportCfg', { netcore, permAddr, auxId, data }
+    - callback(err, result) get called after set
+    - return none 
+
+* getReportCfg(permAddr, auxId, attrName, callback)
+    - get the report settings of an attribute on a gadget
+    - emit '_nc:gadGetReportCfg', { netcore, permAddr, auxId, data }
+    - callback(err, result) get called after got
+    - return none 
+
 
 <a name="Events"></a>
 ## Events to Freebird (fb.emit) 
@@ -353,10 +400,23 @@ nc.registerDevDrivers({
 * _nc:gadIncoming, { netcore: nc, permAddr: addr, auxId: auxId, data: rawGad }          - find diff     -> _gad:panelChanged, _gad:attrsChanged
 * _nc:bannedGadIncoming, { netcore: nc, permAddr: addr, auxId: auxId, data: rawGad }    - find existence
 * _nc:devReporting, { netcore: nc, permAddr: addr, data: attrs }                        - find diff     -> _dev:attrsChanged
-* _nc:bannedDevReporting, { netcore: nc, permAddr: addr, data: attrs }                  - find existence
+* _nc:bannedDevReporting, { netcore: nc, permAddr: addr }                  - find existence
 * _nc:gadReporting, { netcore: nc, permAddr: addr, auxId: auxId, data: attrs }          - find diff     -> _dev:attrsChanged
-* _nc:bannedGadReporting, { netcore: nc, permAddr: addr, auxId: auxId, data: attrs }    - find existence
+* _nc:bannedGadReporting, { netcore: nc, permAddr: addr, auxId: auxId  }    - find existence
 
+* _nc:netPing, { netcore: nc, permAddr: addr, data: time }
+* _nc:netBan
+* _nc:netUnban
+
+* _nc:devRead, { netcore: nc, permAddr: addr, data: x }
+* _nc:devWrite
+* _nc:devIdentify
+
+* _nc:gadRead, { netcore: nc, permAddr: addr, data: x }
+* _nc:gadWrite
+* _nc:gadExec
+* _nc:gadSetReportCfg
+* _nc:gadGetReportCfg
 
 // dev and gad, emit { dev, data } and  { gad, data }
 * _dev:netChanged, { netcore: nc, id: id, permAddr: addr, data: info }                  - changed
@@ -388,11 +448,11 @@ var netInfo = {
 var nc = fbbs.Netcore(rawMod, netInfo);
 
 // override
-nc.cookRawDev = function (raw, dev) {
+nc.cookRawDev = function (dev, raw, cb) {
     // fill up dev
 };
 
-nc.cookRawGad = function (raw, gad) {
+nc.cookRawGad = function (gad, raw, cb) {
     // fill up gad
 };
 
@@ -402,19 +462,18 @@ nc.registerNetDrivers({
     stop: function () {},
     reset: function () {},
     permitJoin: function (duration) {},
-    maintain: function () {},
     enable: function () {},
     disable: function () {},
     remove: function () {},
     ban: function () {},
-    unban: function () {}
+    unban: function () {},
+    ping: function (dev) {}
 });
 
 nc.registerDevDrivers({
     read: function (dev) {},
     write: function (dev) {},
     identify: function (dev) {},
-    ping: function (dev) {}
 });
 
 nc.registerGadDrivers({
@@ -428,82 +487,3 @@ nc.registerGadDrivers({
 // if we are done, export the netcore
 module.exports = nc;
 ```
-
-
-
-/***********************************************************************/
-/*** Events emit up                                                  ***/
-/***   1. devIncoming + device                                       ***/
-/***   2. devLeaving + device                                        ***/
-/***   3. gadIncoming + gadget                                       ***/
-/***   4. permitJoin + timeLeft                                      ***/
-/***   5. devAttrsChanged + device, attrsObj                         ***/
-/***   6. gadAttrsChanged + gadget, attrsObj                         ***/
-/***   7. attrReport + gadget, attrsObj                              ***/
-/***   8. netChanged + device, netInfoObj                            ***/
-/***   9. statusChanged + device, status                             ***/
-/***********************************************************************/
-/***********************************************************************/
-/*** Developer should call                                           ***/
-/***   1. nc.devIncoming(raw)                                        ***/
-/***   2. nc.devLeaving(permAddr)                                    ***/
-/***   3. nc.gadIncoming(permAddr, auxId, meta)                      ***/
-/***   4. >> permitJoin + timeLeft                                   ***/
-/***   5. nc.reportDevAttrs(permAddr, attrs)                         ***/
-/***   6. nc.reportGadAttr(permAddr, auxId, attrs)                   ***/
-/***********************************************************************/
-/***********************************************************************/
-/*** Developer Implements                                            ***/
-/***   1. nc.cookRawDev()                                            ***/
-/***   2. nc.cookRawGad()                                            ***/
-/***   3. nc.cookRawDevAttrsReport()                                 ***/
-/***   4. nc.cookRawGadAttrsReport()                                 ***/
-/***   5. nc.drivers = { net, dev, gad }                             ***/
-/***          nc.registerNetDrivers({})                              ***/
-/***          nc.registerDevDrivers({})                              ***/
-/***          nc.registerGadDrivers({})                              ***/
-/***********************************************************************/
-
-APIs
-devIncoming
-devLeaving
-gadIncoming
-reportDevAttrs
-reportGadAttrs
-dump
-txBytesUp
-rxBytesUp
-
-registerNetDrivers
-registerDevDrivers
-registerGadDrivers
-
-this._drivers = {
-    net: {
-        start: null,        // function(callback) {}
-        stop: null,         // function(callback) {}
-        reset: null,        // function(callback) {}
-        permitJoin: null,   // function(duration, callback) {}
-        maintain: null,     // function([permAddr][, callback]) {}
-        // enable: null,
-        // disable: null,
-        remove: null,       // function(permAddr, callback) {}
-        ban: null,          // function(permAddr, callback) {}
-        unban: null,        // function(permAddr, callback) {}
-        ping: null          // function(permAddr, callback) {}
-    },
-    dev: {
-        read: null,         // function(permAddr, attr, callback) {}
-        write: null,        // function(permAddr, attr, val, callback) {}
-        identify: null,     // function(permAddr, callback) {}
-    },
-    gad: {
-        read: null,         // function(permAddr, auxId, attr, callback) {}
-        write: null,        // function(permAddr, auxId, attr, val, callback) {}
-        exec: null,         // function(permAddr, auxId, attr, args, callback) {}
-        setReportCfg: null, // function(permAddr, auxId, cfg, callback) {}
-        getReportCfg: null  // function(permAddr, auxId, callback) {}
-    }
-};
-
-
