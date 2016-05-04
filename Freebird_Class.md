@@ -16,21 +16,45 @@ Freebird framework core module.
 <a name="Constructor"></a>
 ## Constructor  
 
-var freebird = require('freebird');
+Freebird(httpServer)
+
+**Arguments:**  
+
+1. `httpServer` (_Object_): The http server created by express or node http  
+
+**Returns:**  
+
+* (_Object_) freebird (instance of Freebird class)
+
+**Example:**  
+
+```js
+var Freebird = require('freebird');
+var fb = new Freebird(http_server_create_somewhere);
+```
 
 <br />
 
 <a name="Properties"></a>
 ## Properties  
 
-  
+**Examples:**  
+
 ```js
 {
     // protected
     _plugins: [],
-    _devbox: null,
-    _gadbox: null,
-    _netmux: null
+    _devbox: _Storage_,
+    _gadbox: _Storage_,
+    _netcores: _Netcore[]_,
+    _httpServer: _HTTP-SERVER_,         // created from express or node http
+    _wsServer: _freebird-websocket_,    // only exists when http server is given
+
+    _ncEventListeners: {},              // listeners to bridge low-layer netcore events up
+    _wsApis: {},                        // apis for ws-server to call from
+    net: {},                            // net driver namespace
+    dev: {},                            // dev driver namespace
+    gad: {}                             // gad driver namespace
 }
 ```
 
@@ -39,12 +63,105 @@ var freebird = require('freebird');
 <a name="Methods"></a>
 ## Methods  
 
-* start()
+* _getHttpServer()
+    - get http server
+    - return httpServer or null
+
+* _getWsServer()
+    - get websocket server
+    - return wsServer or null
+
+* _emitws(evt, fbMsg, wsMsg)
+    - emit message to freebird itself and to wsServer
+    - evt: event name
+    - fbMsg: message to freebird itself
+    - wsMsg: message to websokcet server
+    - return none
+
+* _ncInstance(nc)
+    - always get instance of netcore 
+    - return nc or undefined
+
+* _devInstance(dev)
+    - always instance of dev 
+    - return dev or undefined
+
+* _gadInstance(gad)
+    - always instance of gad 
+    - return gad or undefined
+
+* _reload(ncName, callback) - TODO
+    - reload records under the specified netcore
+    - callback(err, recArray)
+    - return none
+
+* getNetcore(ncName)
+    - get registered netcore by its name
+    - return netcore
+
+* findDev(pre)
+    - find a device by predicator
+    - return device or undefined
+
+* findGad(pre)
+    - find a gadget by predicator
+    - return gadget or undefined
+
+* findDevById(id)
+    - find a device by its id
+    - return device or undefined
+
+* findDevByAddr(ncName, permAddr)
+    - find a device from the netcore by its permenant address
+    - return device or undefined
+
+* findGadById(id)
+    - find a gadget by its id
+    - return gadget or undefined
+
+* findGadByAddrAuxId(ncName, permAddr, auxId)
+    - find a gadget from the netcpr by its permenant address and auxiliary id
+    - return gadget or undefined
+
+* registerNetcore(nc) - TODO
+    - register a netcore to freebird
+
+* unregisterNetcore(nc) - TODO
+    - unregister a netcore from freebird
+
+* registerDev(dev, callback)
+    - register a device to freebird
+    - return this
+
+* unregisterDev(dev, callback)
+    - unregister a device from freebird, all gadget will be unregistered
+    - return this
+
+* registerGad(gad, callback)
+    - register a gadget to freebird
+    - return this
+
+* unregisterGad(dev, callback)
+    - unregister a gadget from freebird
+    - return this
+
+* getAllDevs([ncName])
+    - get all devs under a netcore
+    - return Device[]
+
+* getAllGads([ncName])
+    - get all gads under a netcore
+    - return Device[]
+
+* getBlacklist(ncName)
+    - get blacklist of a netcore
+    - return Device[] | undefined
+
+
+
+
 * stop()
-* findDevByAddr()
-* findDevById()
-* findGadById()
-* findGadByAddrAuxId()
+
 * getAllDevs([nc])
 * getAllGads([nc])
 
