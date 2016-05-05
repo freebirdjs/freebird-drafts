@@ -157,32 +157,21 @@ var fb = new Freebird(http_server_create_somewhere);
     - get blacklist of a netcore
     - return Device[] | undefined
 
-
-
-
-* stop()
-
-* getAllDevs([nc])
-* getAllGads([nc])
-
-* updateDevAttrs()
-* updateGadAttrs()
-
 net
 fb.net.start()
 fb.net.stop()
-fb.net.xxx      // netcore public methods
+fb.net.xxx
 
 dev
 fb.dev.enable()
 fb.dev.disable()
-fb.dev.xxx      // dev public methods
+fb.dev.xxx
 
 gad
 
 fb.gad.read()
 fb.gad.write()
-fb.gad.xxx      // gad public methods
+fb.gad.xxx
 
 <a name="Events"></a>
 ## Events  
