@@ -264,6 +264,10 @@ protocol: {         // required
 <a name="UserCalledMethods"></a>
 ## User Called Methods  
 
+* commitReady()
+    - commit to tell the netcore is ready (reset, reboot...)
+    - return Boolean, commit successfully 
+
 * commitDevIncoming(permAddr, rawDev)
     - commit the raw device object of an incoming device
     - return Boolean, commit successfully 
